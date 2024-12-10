@@ -1,5 +1,6 @@
 package com.networks;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,7 +16,7 @@ public class ReaderThread implements Runnable
 	BufferedReader fromServer;
 	ChatScreen screen;
 	String user;
-	ObjectMapper mapper = new ObjectMapper();
+	ObjectMapper mapper;
 
 	public ReaderThread(Socket server, ChatScreen screen, String user) {
 		this.server = server;
@@ -39,6 +40,34 @@ public class ReaderThread implements Runnable
 					System.out.println("Connection closed. Closing Reader thread."); break;
 				}
 
+				if (response.startsWith("200 BOARD")) {
+					String prefix = "200 BOARD ";
+					String trimmedResponse = response.substring(prefix.length()).trim();
+					mapper = new ObjectMapper();
+
+					try {
+						Map<String, UserStatus> incomingBoard = mapper.readValue(trimmedResponse, new TypeReference<Map<String, UserStatus>>() {});
+
+						StringBuilder messageBuilder = new StringBuilder();
+						incomingBoard.forEach((name, status) -> {
+							messageBuilder.append(name).append(" : ").append(status).append("\n");
+						});
+
+						System.out.println(messageBuilder);
+
+						screen.displayMessage("Current Users\n" + messageBuilder);
+					} catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+				if (response.startsWith("{")) {
+					mapper = new ObjectMapper();
+					Message incomingMessage = mapper.readValue(response, Message.class);
+					message = incomingMessage.sender() + " : " + incomingMessage.message() + " (" + incomingMessage.timestamp() + ")";
+					screen.displayMessage(message);
+				}
+
 				switch(response) {
 					case "200 OK":
 						screen.displayMessage("Welcome to the Chatroom " + user + "!"); break;
@@ -49,16 +78,6 @@ public class ReaderThread implements Runnable
 						break;
 					case "200 SENT":
 						break;
-					case "200 BOARD":
-						// TODO: How will I be able to get both the 200 BOARD and the json response?
-						Map<String, UserStatus> incomingBoard = mapper.readValue(response, new TypeReference<Map<String, UserStatus>>() {});
-
-						StringBuilder messageBuilder = new StringBuilder();
-						incomingBoard.forEach((user, status) -> {
-							messageBuilder.append(user).append(" : ").append(status).append("\n");
-						});
-
-						screen.displayMessage("Current Users\n" + messageBuilder);
 					case "400 INVALID USERNAME":
 						screen.displayMessage("Username has been taken.");
 						Thread.sleep(1000);
@@ -70,11 +89,8 @@ public class ReaderThread implements Runnable
 					case "500 SERVER ERROR":
 						screen.displayMessage("Something went wrong"); break;
 					default:
-						Message incomingMessage = mapper.readValue(response, Message.class);
-						message = incomingMessage.sender() + " : " + incomingMessage.message() + " (" + incomingMessage.timestamp() + ")";
+						break;
 				}
-
-				screen.displayMessage(message);
 			}
 		}
 		catch (IOException | InterruptedException ioe) {

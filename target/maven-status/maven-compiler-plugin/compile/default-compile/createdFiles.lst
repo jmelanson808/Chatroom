@@ -1,8 +1,12 @@
 com\networks\Connection.class
+com\networks\UserInfo.class
 com\networks\ReaderThread.class
 com\networks\BroadcastThread.class
+com\networks\ReaderThread$1.class
 com\networks\Server.class
 com\networks\ChatScreen$1.class
 com\networks\Handler.class
+com\networks\UserStatus.class
 com\networks\Message.class
+com\networks\BoardEntry.class
 com\networks\ChatScreen.class

@@ -194,7 +194,7 @@ public class ChatScreen extends JFrame implements ActionListener, KeyListener {
     }
 
     private static String leaveProtocol(String username) {
-        return "LEAVE " + username + "\n";
+        return "LEAVE\n";
     }
 
     private static String userBoardProtocol() {

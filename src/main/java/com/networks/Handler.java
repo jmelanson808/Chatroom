@@ -18,7 +18,7 @@ public class Handler
 	@SuppressWarnings("InfiniteLoopStatement")
 	public void process(Socket client, Map<String, UserInfo> socketWriters, ArrayList<Message> messageQueue) throws IOException {
 		Pattern joinPattern = Pattern.compile("^JOIN (?!all$)[A-Za-z0-9]{3,30}\n$");
-		Pattern leavePattern = Pattern.compile("^LEAVE (?!all$)[A-Za-z0-9]{3,30}\n$");
+		Pattern leavePattern = Pattern.compile("^LEAVE\n$");
 		Pattern sendPattern = Pattern.compile("^SEND \\{.{1,500}}\n$");
         Pattern headerPattern = Pattern.compile("^@[A-Za-z0-9]{3,30} (?:@[A-Za-z0-9]{3,30} )*$");
         Pattern timestampPattern = Pattern.compile("^[0-9]{2}:[0-9]{2}$");
@@ -64,6 +64,7 @@ public class Handler
                     toClient.close();
                     client.close();
                 } else if (userBoardPattern.matcher(message).matches()) {
+                    System.out.println("Request matches USERBOARD protocol");
                     ObjectMapper mapper = new ObjectMapper();
                     Map<String, String> userBoard = new HashMap<>();
 
@@ -74,7 +75,7 @@ public class Handler
                     String userBoardJson = mapper.writeValueAsString(userBoard);
                     System.out.println("Userboard response: " + userBoardJson);
 
-                    toClient.write(userBoardJson);
+                    toClient.write("200 BOARD " + userBoardJson + "\n");
                     toClient.flush();
                 } else if (sendPattern.matcher(message).matches()) {
                     ObjectMapper mapper = new ObjectMapper();
