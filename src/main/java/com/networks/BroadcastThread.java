@@ -30,7 +30,6 @@ public class BroadcastThread implements Runnable {
                 for (Message message : messageQueue) {
                     if (message.header().contains("@all")) {
                         socketWriters.forEach((user, info) -> {
-                            System.out.println("User is: " + user + " | SocketWriter is: " + info.writer());
                             if (!user.equals(message.sender())) {
                                 try {
                                     info.writer().write(mapper.writeValueAsString(message) + "\n");

@@ -20,7 +20,7 @@ public class Handler
 		Pattern joinPattern = Pattern.compile("^JOIN (?!all$)[A-Za-z0-9]{3,30}\n$");
 		Pattern leavePattern = Pattern.compile("^LEAVE\n$");
 		Pattern sendPattern = Pattern.compile("^SEND \\{.{1,500}}\n$");
-        Pattern headerPattern = Pattern.compile("^@[A-Za-z0-9]{3,30} (?:@[A-Za-z0-9]{3,30} )*$");
+        Pattern headerPattern = Pattern.compile("^@[A-Za-z0-9]{3,30}(?: @[A-Za-z0-9]{3,30} ?)*$");
         Pattern timestampPattern = Pattern.compile("^[0-9]{2}:[0-9]{2}$");
         Pattern userBoardPattern = Pattern.compile("^USERBOARD\n$");
 

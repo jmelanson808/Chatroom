@@ -102,7 +102,7 @@ public class ChatScreen extends JFrame implements ActionListener, KeyListener {
 
     public void writeMessage(String message, String username) throws IOException {
         if (Objects.equals(message, "logout")) {
-            leaveServer(username);
+            leaveServer();
         } else if (Objects.equals(message, "userboard")) {
             getUserBoard();
         } else {
@@ -115,8 +115,8 @@ public class ChatScreen extends JFrame implements ActionListener, KeyListener {
          this.toServer.flush();
     }
 
-    public void leaveServer(String request) throws IOException {
-        this.toServer.write(leaveProtocol(request));
+    public void leaveServer() throws IOException {
+        this.toServer.write(leaveProtocol());
         this.toServer.flush();
     }
 
@@ -126,14 +126,14 @@ public class ChatScreen extends JFrame implements ActionListener, KeyListener {
     }
 
     public void buildAndSendMessage(String message) throws IOException {
-        Pattern pattern = Pattern.compile("@\\S+");
+        Pattern pattern = Pattern.compile("@\\S+\\s?");
         Matcher matcher = pattern.matcher(message);
 
         String formattedTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
 
         StringBuilder headerList = new StringBuilder();
         while (matcher.find()) {
-            headerList.append(matcher.group().trim()).append(" ");
+            headerList.append(matcher.group().trim());
         }
 
         Map<String, Object> requestMap = new HashMap<>();
@@ -193,7 +193,7 @@ public class ChatScreen extends JFrame implements ActionListener, KeyListener {
         return "JOIN " + username + "\n";
     }
 
-    private static String leaveProtocol(String username) {
+    private static String leaveProtocol() {
         return "LEAVE\n";
     }
 
