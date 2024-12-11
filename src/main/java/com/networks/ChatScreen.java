@@ -94,13 +94,13 @@ public class ChatScreen extends JFrame implements ActionListener, KeyListener {
     public void displayText() throws IOException {
         String message = sendText.getText().trim();
 
-        writeMessage(message, username);
+        writeMessage(message);
 
         sendText.setText("");
         sendText.requestFocus();
     }
 
-    public void writeMessage(String message, String username) throws IOException {
+    public void writeMessage(String message) throws IOException {
         if (Objects.equals(message, "logout")) {
             leaveServer();
         } else if (Objects.equals(message, "userboard")) {
